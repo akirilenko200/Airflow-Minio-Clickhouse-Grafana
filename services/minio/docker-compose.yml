@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  minio:
+    hostname: minio
+    container_name: minio-container
+    image: quay.io/minio/minio
+    env_file: 
+      - .env
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - '../../volumes/minio/data:/data'
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 15s
+      timeout: 25s
+      retries: 5
+    
+  # this is an init container
+  stocks_to_minio:
+    container_name: minio-init
+    image: minio/mc
+    restart: no
+    env_file: 
+      - .env
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/bash -c "
+      mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+      mc admin user svcacct add --access-key $${MINIO_ACCESS_KEY} --secret-key $${MINIO_SECRET_KEY} myminio minio;
+      mc mb myminio/$${MINIO_BUCKET_RAW};
+      mc mb myminio/$${MINIO_BUCKET_PROCESSED}
+      "
+
+networks:
+  default:
+    name: pipeline-network

@@ -1,0 +1,6 @@
+.git/
+.venv/
+.DS_Store
+volumes/airflow/logs/
+volumes/clickhouse/data/
+volumes/minio/data

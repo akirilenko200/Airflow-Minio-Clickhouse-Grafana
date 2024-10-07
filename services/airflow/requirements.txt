@@ -1,0 +1,6 @@
+apache-airflow[pandas]
+apache-airflow-providers-amazon==8.28.0
+apache-airflow-providers-docker==3.13.0
+clickhouse-driver[lz4,zstd]
+faker
+s3fs

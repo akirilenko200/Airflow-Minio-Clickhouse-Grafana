@@ -1,0 +1,17 @@
+services:
+  grafana:
+    hostname: grafana
+    build: 
+      context: ${PWD}
+      dockerfile: Dockerfile
+    container_name: grafana-container
+    env_file:
+      - .env
+    volumes:
+      - ../../volumes/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../../volumes/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - "3000:3000"
+networks:
+  default:
+    name: pipeline-network
